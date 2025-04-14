@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connector Flashcards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .flashcard {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 320px;
+      height: 220px;
+      margin: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      text-align: center;
+      padding: 1rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .flashcard:hover {
+      transform: scale(1.05);
+    }
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    select {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hardware Connector Flashcards</h1>
+  <select id="categoryFilter">
+    <option value="All">All Categories</option>
+  </select>
+  <div id="flashcard" class="flashcard" tabindex="0">
+    <img id="flashcard-img" src="" alt="Connector Image" style="display: none;">
+    <span id="flashcard-text"></span>
+  </div>
+
+  <script>
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    const categories = {
+      "USB": ["USB 2.0 Micro-A (male).jpg","USB 2.0 Micro-B (male).jpg","USB 2.0 mini-A (male).jpg","USB 2.0 mini-B (male).jpg","USB 2.0 Type A (female).jpg","USB 2.0 Type A (male).jpg","USB 2.0 Type B (female).jpg","USB 2.0 Type B (male).jpg","USB 3.0 Micro B (male).jpg","USB 3.0 Type-A (female).jpg","USB 3.0 Type-A (male).jpg","USB 3.0 Type-B (male).jpg","USB 3.0 Type-C (female).jpg","USB 3.0 Type-C (male).jpg"],
+      "Video": ["VGA SVGA (female) de-15.jpg","VGA SVGA (male) de-15.jpg","Displayport (female).jpg","Displayport (male).jpg","Mini displayport (female).jpg","Mini displayport (male).jpg","Mini HDMI Type C.jpg","Micro HDMI Type D.jpg","Mini-DVI.jpg","Micro-DVI.jpg","DVI-D Dual Link DMS-59.jpg","DVI-D Dual Link LFH-60.jpg","DVI-D single Link.jpg","DVI-i DUAL Link.jpg","DVI-i Single Link.jpg","Apple Display Conn (ADC).jpg","S-Video.jpg","Component Video (f).jpg","Component Video (m).jpg","Composite AV (RCA).jpg","Thunderbolt.jpg"],
+      "Audio": ["Line-out headphones.jpg","Microphone.jpg","Stereo Line in.jpg","Subwoofer center out.jpg","Rear surround Speakers.jpg","Mid surround Speakers.jpg","Digital Audio (RCA).jpg","Optical Audio (Toslink).jpg"],
+      "Networking & Communication": ["Ethernet RJ-45.jpg","GigE RJ-45 (SFP).jpg","Modem Phone RJ-11.jpg","Serial RS232 (f) DE-9.jpg","Serial RS232 (m) DE-9.jpg","Serial Parallel (f) DB-25.jpg","Midi gameport DA-15.jpg","Centronics Parallel 36-pin.jpg","Firewire 400 1394a 4-pin.jpg","Firewire 400 1394a 6-pin.jpg","Firewire 800 3200 1394b c.jpg"],
+      "Storage & Power": ["e-SATA.jpg","mSATA.jpg","M2.jpg","U2.jpg","IDE 40-pin.jpg","SAS (Serial Attached SCSI).jpg","SATA Power Connector.jpg","Sata Type A.jpg","SCSI Micro D868 (female).jpg","SCSI Micro D868 (male).jpg","Internal 50-pin SCSI (F).jpg","Internal 68-pin SCSI (F).jpg","Molex 4-pin Connector.jpg","IEC 320 C13 C14 Connector.jpg","IEC 320 C13 Socket (f).jpg","IEC 320 C14 plug (m).jpg","IEC 320 C19 (f).jpg","IEC 320 C20 (m).jpg","IEC 320 CS Connector.jpg","Lightning.jpg"],
+      "Bonus": ["BNC_Connector.jpg","CompactFlash_(CF).jpg","Mini_XLR.jpg","RJ-21_Telco.jpg"]
+    };
+
+    const categoryFilter = document.getElementById("categoryFilter");
+    const card = document.getElementById("flashcard");
+    const cardImg = document.getElementById("flashcard-img");
+    const cardText = document.getElementById("flashcard-text");
+
+    let flashcards = [];
+    let current = 0;
+    let showingAnswer = false;
+
+    function buildFlashcards(selectedCategory) {
+      flashcards = [];
+      const entries = Object.entries(categories);
+      for (const [category, files] of entries) {
+        if (selectedCategory === "All" || category === selectedCategory) {
+          const shuffled = [...files];
+          shuffle(shuffled);
+          flashcards.push(...shuffled.map(filename => ({
+            image: filename,
+            answer: `${filename.replace(/_/g, ' ').replace(/\.[^/.]+$/, '')}`
+          })));
+        }
+      }
+      current = 0;
+      showQuestion();
+    }
+
+    function populateCategoryFilter() {
+      const keys = Object.keys(categories);
+      keys.forEach(key => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        categoryFilter.appendChild(option);
+      });
+    }
+
+    function showQuestion() {
+      cardImg.src = flashcards[current].image;
+      cardImg.style.display = "block";
+      cardText.textContent = "";
+      showingAnswer = false;
+    }
+
+    function showAnswer() {
+      cardImg.style.display = "none";
+      cardText.textContent = flashcards[current].answer;
+      showingAnswer = true;
+    }
+
+    function nextCard() {
+      current = (current + 1) % flashcards.length;
+      showQuestion();
+    }
+
+    function handleFlashcardClick() {
+      if (showingAnswer) {
+        nextCard();
+      } else {
+        showAnswer();
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.code === "Space") {
+        event.preventDefault();
+        handleFlashcardClick();
+      } else if (event.code === "ArrowRight") {
+        nextCard();
+      } else if (event.code === "ArrowLeft") {
+        current = (current - 1 + flashcards.length) % flashcards.length;
+        showQuestion();
+      }
+    }
+
+    card.addEventListener("click", handleFlashcardClick);
+    document.addEventListener("keydown", handleKeyDown);
+    categoryFilter.addEventListener("change", () => {
+      buildFlashcards(categoryFilter.value);
+    });
+
+    populateCategoryFilter();
+    buildFlashcards("All");
+  </script>
+</body>
+</html>
