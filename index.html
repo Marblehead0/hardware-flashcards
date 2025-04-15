@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connector Flashcards</title>
+  <title>Cyber Crime Study Flashcards</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,122 +38,315 @@
       max-width: 100%;
       max-height: 100%;
     }
-    select {
+    select, button {
       margin-bottom: 1rem;
       padding: 0.5rem;
       font-size: 1rem;
     }
+    #selectorView, #flashcardView {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    #selectorView.active, #flashcardView.active {
+      display: flex;
+    }
   </style>
 </head>
 <body>
-  <h1>Hardware Connector Flashcards</h1>
-  <select id="categoryFilter">
-    <option value="All">All Categories</option>
-  </select>
-  <div id="flashcard" class="flashcard" tabindex="0">
-    <img id="flashcard-img" src="" alt="Connector Image" style="display: none;">
-    <span id="flashcard-text"></span>
+<div id="selectorView" class="active">
+  <h1>Select Flashcard Set</h1>
+  <button id="hardwareBtn">Hardware Connectors</button>
+  <button id="osBtn">Operating System Knowledge</button>
+  <button id="networkBtn">Networking Basics</button>
+  <button id="forensicsBtn">Forensics & Attacks</button>
+  <button id="lawBtn">ICT Law & Criminality</button>
+  <button id="scriptBtn">Scripting</button>
+</div>
+
+
+  <div id="flashcardView">
+    <h1 id="flashcardTitle"></h1>
+    <select id="categoryFilter">
+      <option value="All">All Categories</option>
+    </select>
+    <div id="flashcard" class="flashcard" tabindex="0">
+      <img id="flashcard-img" src="" alt="Connector Image" style="display: none;">
+      <span id="flashcard-text"></span>
+    </div>
+    <button id="backBtn">Back</button>
   </div>
 
   <script>
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    window.addEventListener('DOMContentLoaded', () => {
+      const categoryFilter = document.getElementById("categoryFilter");
+      const card = document.getElementById("flashcard");
+      const cardImg = document.getElementById("flashcard-img");
+      const cardText = document.getElementById("flashcard-text");
+      const selectorView = document.getElementById("selectorView");
+      const flashcardView = document.getElementById("flashcardView");
+      const flashcardTitle = document.getElementById("flashcardTitle");
+
+      const hardwareCategories = {
+  "USB": ["USB 2.0 Micro-A (male).jpg", "USB 2.0 Micro-B (male).jpg", "USB 2.0 mini-A (male).jpg", "USB 2.0 mini-B (male).jpg", "USB 2.0 Type A (female).jpg", "USB 2.0 Type A (male).jpg", "USB 2.0 Type B (female).jpg", "USB 2.0 Type B (male).jpg", "USB 3.0 Micro B (male).jpg", "USB 3.0 Type-A (female).jpg", "USB 3.0 Type-A (male).jpg", "USB 3.0 Type-B (male).jpg", "USB 3.0 Type-C (female).jpg", "USB 3.0 Type-C (male).jpg"],
+  "Video": ["VGA SVGA (female) de-15.jpg", "VGA SVGA (male) de-15.jpg", "Displayport (female).jpg", "Displayport (male).jpg", "Mini displayport (female).jpg", "Mini displayport (male).jpg", "Mini HDMI Type C.jpg", "Micro HDMI Type D.jpg", "Mini-DVI.jpg", "Micro-DVI.jpg", "DVI-D Dual Link DMS-59.jpg", "DVI-D Dual Link LFH-60.jpg", "DVI-D single Link.jpg", "DVI-i DUAL Link.jpg", "DVI-i Single Link.jpg", "Apple Display Conn (ADC).jpg", "S-Video.jpg", "Component Video (f).jpg", "Component Video (m).jpg", "Composite AV (RCA).jpg", "Thunderbolt.jpg"],
+  "Audio": ["Line-out headphones.jpg", "Microphone.jpg", "Stereo Line in.jpg", "Subwoofer center out.jpg", "Rear surround Speakers.jpg", "Mid surround Speakers.jpg", "Digital Audio (RCA).jpg", "Optical Audio (Toslink).jpg"],
+  "Networking & Communication": ["Ethernet RJ-45.jpg", "GigE RJ-45 (SFP).jpg", "Modem Phone RJ-11.jpg", "Serial RS232 (f) DE-9.jpg", "Serial RS232 (m) DE-9.jpg", "Serial Parallel (f) DB-25.jpg", "Midi gameport DA-15.jpg", "Centronics Parallel 36-pin.jpg", "Firewire 400 1394a 4-pin.jpg", "Firewire 400 1394a 6-pin.jpg", "Firewire 800 3200 1394b c.jpg"],
+  "Storage & Power": ["e-SATA.jpg", "mSATA.jpg", "M2.jpg", "U2.jpg", "IDE 40-pin.jpg", "SAS (Serial Attached SCSI).jpg", "SATA Power Connector.jpg", "Sata Type A.jpg", "SCSI Micro D868 (female).jpg", "SCSI Micro D868 (male).jpg", "Internal 50-pin SCSI (F).jpg", "Internal 68-pin SCSI (F).jpg", "Molex 4-pin Connector.jpg", "IEC 320 C13 C14 Connector.jpg", "IEC 320 C13 Socket (f).jpg", "IEC 320 C14 plug (m).jpg", "IEC 320 C19 (f).jpg", "IEC 320 C20 (m).jpg", "IEC 320 CS Connector.jpg", "Lightning.jpg"],
+  "Bonus": ["BNC_Connector.jpg", "CompactFlash_(CF).jpg", "Mini_XLR.jpg", "RJ-21_Telco.jpg"]
+};
+      const osCategories = {
+  "Windows": [
+    { question: "What is the default file system used in Windows?", answer: "NTFS" },
+    { question: "What does BitLocker do?", answer: "Provides full disk encryption" },
+    { question: "Where can you view Windows Event Logs?", answer: "eventvwr.msc" },
+    { question: "What command lists running processes?", answer: "tasklist" },
+    { question: "What command is used to terminate a task?", answer: "taskkill" },
+    { question: "What is the Windows command to view network configuration?", answer: "ipconfig /all" },
+    { question: "What is the shortcut to open Task Manager?", answer: "Ctrl + Shift + Esc" },
+    { question: "What utility is used to edit the Windows registry?", answer: "regedit" }
+  ],
+  "Linux": [
+    { question: "What is the default Linux file system?", answer: "ext4" },
+    { question: "Where are Linux system logs stored?", answer: "/var/log/" },
+    { question: "What command lists active network connections?", answer: "netstat -tuln" },
+    { question: "How do you update packages on Debian-based systems?", answer: "sudo apt update && sudo apt upgrade" },
+    { question: "What does the 'chmod' command do?", answer: "Changes file permissions" },
+    { question: "How do you find running processes on Linux?", answer: "ps aux or top" },
+    { question: "What command is used to switch users?", answer: "su or sudo su" }
+  ],
+  "macOS": [
+    { question: "What is the macOS file system?", answer: "APFS" },
+    { question: "What is the name of macOS backup system?", answer: "Time Machine" },
+    { question: "What command checks SIP status?", answer: "csrutil status" },
+    { question: "What is FileVault used for?", answer: "Full disk encryption" },
+    { question: "Where can you find system logs?", answer: "Console app or /var/log/" },
+    { question: "How can you list all disks in macOS?", answer: "diskutil list" },
+    { question: "What is the command to flush DNS cache in macOS?", answer: "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder" }
+  ]
+};
+      const networkCategories = {
+  "IP Addressing": [
+    { question: "What is the loopback IP address?", answer: "127.0.0.1" },
+    { question: "What is the range for Class A private IPs?", answer: "10.0.0.0 – 10.255.255.255" },
+    { question: "What is the range for Class B private IPs?", answer: "172.16.0.0 – 172.31.255.255" },
+    { question: "What is the range for Class C private IPs?", answer: "192.168.0.0 – 192.168.255.255" },
+    { question: "What is the purpose of a subnet mask?", answer: "It divides the IP address into network and host parts" }
+  ],
+  "Subnetting": [
+    { question: "What does /24 mean in CIDR notation?", answer: "Subnet mask 255.255.255.0" },
+    { question: "How many hosts are supported by a /24 network?", answer: "254 usable addresses" },
+    { question: "How many networks can a /30 subnet divide into?", answer: "Each /30 gives 2 usable host addresses" },
+    { question: "What subnet mask is used for a /16 network?", answer: "255.255.0.0" }
+  ],
+  "OSI Model": [
+    { question: "What is the role of Layer 1 – Physical?", answer: "It deals with the physical connection between devices and transmission of binary data over media." },
+    { question: "What is the role of Layer 2 – Data Link?", answer: "It handles MAC addressing and error detection for data packets between directly connected nodes." },
+    { question: "What is the role of Layer 3 – Network?", answer: "It handles routing, addressing (IP), and packet forwarding between networks." },
+    { question: "What is the role of Layer 4 – Transport?", answer: "It ensures end-to-end communication, error recovery, and flow control using TCP/UDP." },
+    { question: "What is the role of Layer 5 – Session?", answer: "It manages sessions or connections between applications on different devices." },
+    { question: "What is the role of Layer 6 – Presentation?", answer: "It translates data formats, encrypts, and compresses information for the application layer." },
+    { question: "What is the role of Layer 7 – Application?", answer: "It interacts directly with end-user software like web browsers and email clients, providing services like HTTP, FTP, SMTP." }
+  ],
+  "Common Ports": [
+    { question: "What port is used for HTTP?", answer: "Port 80" },
+    { question: "What port is used for HTTPS?", answer: "Port 443" },
+    { question: "What port does DNS use?", answer: "Port 53" },
+    { question: "What port does SSH use?", answer: "Port 22" },
+    { question: "What port does FTP use?", answer: "Port 21" },
+    { question: "What port does SMTP use?", answer: "Port 25" }
+  ]
+};
+      const forensicsCategories = {
+  "Cyber Attacks": [
+    { question: "What is a phishing attack?", answer: "A social engineering attack that tricks users into revealing sensitive info via fake emails or sites. Prevent by training, filtering emails, and using MFA." },
+    { question: "What is a DDoS attack?", answer: "Distributed Denial of Service: floods a server with traffic to crash it. Prevent with firewalls, rate limiting, and cloud protection services." },
+    { question: "What is a ransomware attack?", answer: "Malware that encrypts files and demands payment for decryption. Prevent by backups, patches, and user awareness." },
+    { question: "What is a man-in-the-middle (MitM) attack?", answer: "An attacker intercepts communication between two parties. Prevent using TLS/SSL encryption and VPNs." },
+    { question: "What is an SQL Injection?", answer: "Injection of malicious SQL code into input fields to control databases. Prevent with input validation and parameterized queries." },
+    { question: "What is privilege escalation?", answer: "Gaining unauthorized access to higher permissions. Prevent with least privilege, patches, and monitoring." },
+    { question: "What is a zero-day attack?", answer: "An attack that exploits a previously unknown vulnerability. Prevent with endpoint protection and timely patching." },
+    { question: "What is a brute-force attack?", answer: "Attempting many password combinations to break into accounts. Prevent with strong password policies and rate limiting." }
+  ]
+};
+
+const lawCategories = {
+  "ICT Law & Criminality": [
+    { question: "What is the GDPR?", answer: "General Data Protection Regulation — EU law on data protection and privacy." },
+    { question: "What is the purpose of a data breach notification law?", answer: "Requires organizations to notify authorities/users after data leaks." },
+    { question: "What is cybercrime?", answer: "Criminal activity involving computers or networks, such as hacking or identity theft." },
+    { question: "What is digital evidence?", answer: "Information stored or transmitted in digital form that can be used in court." },
+    { question: "What does 'chain of custody' mean in digital forensics?", answer: "Documented process of handling digital evidence to ensure integrity." },
+    { question: "What is the purpose of a cybersecurity policy?", answer: "To establish rules for protecting IT systems and data." },
+    { question: "What law governs the interception of communications in many countries?", answer: "Lawful Interception laws (e.g. in Belgium: BIPT regulations)." },
+    { question: "What are common penalties for hacking under ICT law?", answer: "Fines, imprisonment, and loss of access rights." }
+  ]
+};
+
+const scriptingCategories = {
+  "Bash": [
+    { question: "How do you print text in Bash?", answer: "Using the echo command: echo 'Hello World'" },
+    { question: "How do you make a Bash script executable?", answer: "Use chmod +x script.sh" },
+    { question: "How do you read a variable in Bash?", answer: "With the $ symbol: echo $VARIABLE" },
+    { question: "How do you write an if statement in Bash?", answer: "if [ condition ]; then ... fi" },
+    { question: "How do you write a loop in Bash?", answer: "for i in {1..5}; do echo $i; done" },
+    { question: "How do you read input from the user in Bash?", answer: "Use read: read variableName" },
+    { question: "What does this Bash command do: for f in *.txt; do echo $f; done", answer: "Prints the name of every .txt file in the directory." }
+  ],
+  "PowerShell": [
+    { question: "How do you list processes in PowerShell?", answer: "Use Get-Process" },
+    { question: "How do you read a file's content in PowerShell?", answer: "Use Get-Content filename.txt" },
+    { question: "What symbol is used for variables in PowerShell?", answer: "$ (dollar sign)" },
+    { question: "How do you define a function in PowerShell?", answer: "function My-Function { ... }" },
+    { question: "How do you write a conditional in PowerShell?", answer: "if (condition) { ... }" },
+    { question: "How do you comment a line in PowerShell?", answer: "Use #: # This is a comment" },
+    { question: "What does this command do: Get-ChildItem -Recurse", answer: "Lists all files and folders recursively from the current directory." }
+  ],
+  "Python": [
+    { question: "How do you define a function in Python?", answer: "Use def keyword: def my_function():" },
+    { question: "What command prints output in Python?", answer: "print('Hello')" },
+    { question: "How do you install a package in Python?", answer: "pip install package_name" },
+    { question: "How do you write a for loop in Python?", answer: "for i in range(5):" },
+    { question: "How do you write an if statement in Python?", answer: "if condition:" },
+    { question: "What symbol is used for comments in Python?", answer: "#" },
+    { question: "What does this code do: print([x for x in range(5)])", answer: "Prints a list: [0, 1, 2, 3, 4]" },
+    { question: "What does this code do: def greet(name): return f'Hello {name}'", answer: "Defines a function that returns a greeting with the provided name." }
+  ]
+}; 
+
+      let flashcards = [];
+      let current = 0;
+      let showingAnswer = false;
+      let mode = "hardware";
+
+      function startSet(selected) {
+        mode = selected;
+        selectorView.classList.remove("active");
+        flashcardView.classList.add("active");
+        categoryFilter.innerHTML = '<option value="All">All Categories</option>';
+        populateCategoryFilter();
+        buildFlashcards("All");
       }
-    }
 
-    const categories = {
-      "USB": ["USB 2.0 Micro-A (male).jpg","USB 2.0 Micro-B (male).jpg","USB 2.0 mini-A (male).jpg","USB 2.0 mini-B (male).jpg","USB 2.0 Type A (female).jpg","USB 2.0 Type A (male).jpg","USB 2.0 Type B (female).jpg","USB 2.0 Type B (male).jpg","USB 3.0 Micro B (male).jpg","USB 3.0 Type-A (female).jpg","USB 3.0 Type-A (male).jpg","USB 3.0 Type-B (male).jpg","USB 3.0 Type-C (female).jpg","USB 3.0 Type-C (male).jpg"],
-      "Video": ["VGA SVGA (female) de-15.jpg","VGA SVGA (male) de-15.jpg","Displayport (female).jpg","Displayport (male).jpg","Mini displayport (female).jpg","Mini displayport (male).jpg","Mini HDMI Type C.jpg","Micro HDMI Type D.jpg","Mini-DVI.jpg","Micro-DVI.jpg","DVI-D Dual Link DMS-59.jpg","DVI-D Dual Link LFH-60.jpg","DVI-D single Link.jpg","DVI-i DUAL Link.jpg","DVI-i Single Link.jpg","Apple Display Conn (ADC).jpg","S-Video.jpg","Component Video (f).jpg","Component Video (m).jpg","Composite AV (RCA).jpg","Thunderbolt.jpg"],
-      "Audio": ["Line-out headphones.jpg","Microphone.jpg","Stereo Line in.jpg","Subwoofer center out.jpg","Rear surround Speakers.jpg","Mid surround Speakers.jpg","Digital Audio (RCA).jpg","Optical Audio (Toslink).jpg"],
-      "Networking & Communication": ["Ethernet RJ-45.jpg","GigE RJ-45 (SFP).jpg","Modem Phone RJ-11.jpg","Serial RS232 (f) DE-9.jpg","Serial RS232 (m) DE-9.jpg","Serial Parallel (f) DB-25.jpg","Midi gameport DA-15.jpg","Centronics Parallel 36-pin.jpg","Firewire 400 1394a 4-pin.jpg","Firewire 400 1394a 6-pin.jpg","Firewire 800 3200 1394b c.jpg"],
-      "Storage & Power": ["e-SATA.jpg","mSATA.jpg","M2.jpg","U2.jpg","IDE 40-pin.jpg","SAS (Serial Attached SCSI).jpg","SATA Power Connector.jpg","Sata Type A.jpg","SCSI Micro D868 (female).jpg","SCSI Micro D868 (male).jpg","Internal 50-pin SCSI (F).jpg","Internal 68-pin SCSI (F).jpg","Molex 4-pin Connector.jpg","IEC 320 C13 C14 Connector.jpg","IEC 320 C13 Socket (f).jpg","IEC 320 C14 plug (m).jpg","IEC 320 C19 (f).jpg","IEC 320 C20 (m).jpg","IEC 320 CS Connector.jpg","Lightning.jpg"],
-      "Bonus": ["BNC_Connector.jpg","CompactFlash_(CF).jpg","Mini_XLR.jpg","RJ-21_Telco.jpg"]
-    };
+      function goBack() {
+        flashcardView.classList.remove("active");
+        selectorView.classList.add("active");
+      }
 
-    const categoryFilter = document.getElementById("categoryFilter");
-    const card = document.getElementById("flashcard");
-    const cardImg = document.getElementById("flashcard-img");
-    const cardText = document.getElementById("flashcard-text");
-
-    let flashcards = [];
-    let current = 0;
-    let showingAnswer = false;
-
-    function buildFlashcards(selectedCategory) {
-      flashcards = [];
-      const entries = Object.entries(categories);
-      for (const [category, files] of entries) {
-        if (selectedCategory === "All" || category === selectedCategory) {
-          const shuffled = [...files];
-          shuffle(shuffled);
-          flashcards.push(...shuffled.map(filename => ({
-            image: filename,
-            answer: `${filename.replace(/_/g, ' ').replace(/\.[^/.]+$/, '')}`
-          })));
+      function buildFlashcards(selectedCategory) {
+        flashcards = [];
+   const source = mode === "hardware"
+  ? hardwareCategories
+  : mode === "os"
+  ? osCategories
+  : mode === "network"
+  ? networkCategories
+  : mode === "forensics"
+  ? forensicsCategories
+  : mode === "law"
+  ? lawCategories
+  : scriptingCategories;
+        for (const [category, items] of Object.entries(source)) {
+          if (selectedCategory === "All" || category === selectedCategory) {
+            flashcards.push(...items.map(item => {
+              if (typeof item === 'string') {
+                return { image: item, answer: item.replace(/_/g, ' ').replace(/\.[^/.]+$/, '') };
+              } else {
+                return item;
+              }
+            }));
+          }
         }
-      }
-      current = 0;
-      showQuestion();
-    }
-
-    function populateCategoryFilter() {
-      const keys = Object.keys(categories);
-      keys.forEach(key => {
-        const option = document.createElement("option");
-        option.value = key;
-        option.textContent = key;
-        categoryFilter.appendChild(option);
-      });
-    }
-
-    function showQuestion() {
-      cardImg.src = flashcards[current].image;
-      cardImg.style.display = "block";
-      cardText.textContent = "";
-      showingAnswer = false;
-    }
-
-    function showAnswer() {
-      cardImg.style.display = "none";
-      cardText.textContent = flashcards[current].answer;
-      showingAnswer = true;
-    }
-
-    function nextCard() {
-      current = (current + 1) % flashcards.length;
-      showQuestion();
-    }
-
-    function handleFlashcardClick() {
-      if (showingAnswer) {
-        nextCard();
-      } else {
-        showAnswer();
-      }
-    }
-
-    function handleKeyDown(event) {
-      if (event.code === "Space") {
-        event.preventDefault();
-        handleFlashcardClick();
-      } else if (event.code === "ArrowRight") {
-        nextCard();
-      } else if (event.code === "ArrowLeft") {
-        current = (current - 1 + flashcards.length) % flashcards.length;
+        current = 0;
+        flashcardTitle.textContent = mode.charAt(0).toUpperCase() + mode.slice(1)
+  .replace('os', 'Operating Systems')
+  .replace('network', 'Networking')
+  .replace('forensics', 'Forensics & Attacks')
+  .replace('law', 'ICT Law & Criminality')
+  .replace('scripting', 'Scripting Basics');
         showQuestion();
       }
-    }
 
-    card.addEventListener("click", handleFlashcardClick);
-    document.addEventListener("keydown", handleKeyDown);
-    categoryFilter.addEventListener("change", () => {
-      buildFlashcards(categoryFilter.value);
+      function populateCategoryFilter() {
+const source = mode === "hardware"
+  ? hardwareCategories
+  : mode === "os"
+  ? osCategories
+  : mode === "network"
+  ? networkCategories
+  : mode === "forensics"
+  ? forensicsCategories
+  : mode === "law"
+  ? lawCategories
+  : scriptingCategories;
+        for (const key of Object.keys(source)) {
+          const option = document.createElement("option");
+          option.value = key;
+          option.textContent = key;
+          categoryFilter.appendChild(option);
+        }
+      }
+
+      function showQuestion() {
+        const cardData = flashcards[current];
+        if (cardData.image) {
+          cardImg.src = cardData.image;
+          cardImg.style.display = "block";
+          cardText.textContent = "";
+        } else {
+          cardImg.style.display = "none";
+          cardText.textContent = cardData.question;
+        }
+        showingAnswer = false;
+      }
+
+      function showAnswer() {
+        const cardData = flashcards[current];
+        cardText.textContent = cardData.answer;
+        cardImg.style.display = "none";
+        showingAnswer = true;
+      }
+
+      function nextCard() {
+        current = (current + 1) % flashcards.length;
+        showQuestion();
+      }
+
+      function handleFlashcardClick() {
+        if (showingAnswer) {
+          nextCard();
+        } else {
+          showAnswer();
+        }
+      }
+
+      function handleKeyDown(event) {
+        if (event.code === "Space") {
+          event.preventDefault();
+          handleFlashcardClick();
+        } else if (event.code === "ArrowRight") {
+          nextCard();
+        } else if (event.code === "ArrowLeft") {
+          current = (current - 1 + flashcards.length) % flashcards.length;
+          showQuestion();
+        }
+      }
+
+      card.addEventListener("click", handleFlashcardClick);
+      document.addEventListener("keydown", handleKeyDown);
+      categoryFilter.addEventListener("change", () => {
+        buildFlashcards(categoryFilter.value);
+      });
+
+      document.getElementById("hardwareBtn").addEventListener("click", () => startSet("hardware"));
+      document.getElementById("osBtn").addEventListener("click", () => startSet("os"));
+      document.getElementById("networkBtn").addEventListener("click", () => startSet("network"));
+      document.getElementById("forensicsBtn").addEventListener("click", () => startSet("forensics"));
+      document.getElementById("lawBtn").addEventListener("click", () => startSet("law"));
+        document.getElementById("scriptBtn").addEventListener("click", () => startSet("scripting"));
+      document.getElementById("backBtn").addEventListener("click", goBack);
     });
 
-    populateCategoryFilter();
-    buildFlashcards("All");
-  </script>
+ </script>
 </body>
 </html>
