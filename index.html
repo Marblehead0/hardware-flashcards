@@ -62,6 +62,7 @@
   <button id="forensicsBtn">Forensics & Attacks</button>
   <button id="lawBtn">ICT Law & Criminality</button>
   <button id="scriptBtn">Scripting</button>
+  <button id="cryptoBtn">Crypto</button>
 </div>
 
 
@@ -212,6 +213,18 @@ const scriptingCategories = {
     { question: "What does this code do: print([x for x in range(5)])", answer: "Prints a list: [0, 1, 2, 3, 4]" },
     { question: "What does this code do: def greet(name): return f'Hello {name}'", answer: "Defines a function that returns a greeting with the provided name." }
   ]
+};
+
+const cryptoCategories = {
+  "Crypto": [
+    { question: "What is encryption?", answer: "The process of converting data into a coded form to prevent unauthorized access." },
+    { question: "What is symmetric encryption?", answer: "Encryption using the same key for both encryption and decryption (e.g., AES)." },
+    { question: "What is asymmetric encryption?", answer: "Encryption using a public key for encryption and a private key for decryption (e.g., RSA)." },
+    { question: "What is a hash function?", answer: "A function that converts input data into a fixed-size string (e.g., SHA-256) and is not reversible." },
+    { question: "What is the purpose of a digital signature?", answer: "To verify the authenticity and integrity of a message using asymmetric cryptography." },
+    { question: "What is a common use of hashing in passwords?", answer: "To store passwords securely by saving only the hash and comparing hashes at login." },
+    { question: "What is a salt in password hashing?", answer: "Random data added to a password before hashing to make attacks like rainbow tables ineffective." }
+  ]
 }; 
 
       let flashcards = [];
@@ -245,7 +258,9 @@ const scriptingCategories = {
   ? forensicsCategories
   : mode === "law"
   ? lawCategories
-  : scriptingCategories;
+  : mode === "scripting"
+  ? scriptingCategories
+  : cryptoCategories;
         for (const [category, items] of Object.entries(source)) {
           if (selectedCategory === "All" || category === selectedCategory) {
             flashcards.push(...items.map(item => {
@@ -344,6 +359,7 @@ const source = mode === "hardware"
       document.getElementById("forensicsBtn").addEventListener("click", () => startSet("forensics"));
       document.getElementById("lawBtn").addEventListener("click", () => startSet("law"));
         document.getElementById("scriptBtn").addEventListener("click", () => startSet("scripting"));
+document.getElementById("cryptoBtn").addEventListener("click", () => startSet("crypto"));
       document.getElementById("backBtn").addEventListener("click", goBack);
     });
 
