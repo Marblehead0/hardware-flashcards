@@ -63,6 +63,8 @@
   <button id="lawBtn">ICT Law & Criminality</button>
   <button id="scriptBtn">Scripting</button>
   <button id="cryptoBtn">Crypto</button>
+  <button id="blockchainBtn">Blockchain</button>
+  <button id="encryptionBtn">File Encryption</button>
 </div>
 
 
@@ -225,6 +227,30 @@ const cryptoCategories = {
     { question: "What is a common use of hashing in passwords?", answer: "To store passwords securely by saving only the hash and comparing hashes at login." },
     { question: "What is a salt in password hashing?", answer: "Random data added to a password before hashing to make attacks like rainbow tables ineffective." }
   ]
+};
+
+const blockchainCategories = {
+  "Blockchain": [
+    { question: "What is a blockchain?", answer: "A distributed ledger that records transactions in a secure, verifiable, and permanent way." },
+    { question: "What is a block in blockchain?", answer: "A container of transaction data, a timestamp, and a reference to the previous block." },
+    { question: "What ensures integrity in blockchain?", answer: "Cryptographic hashing links each block to the previous one, making tampering evident." },
+    { question: "What is a smart contract?", answer: "A self-executing contract with rules directly written into code, running on a blockchain." },
+    { question: "What is mining in blockchain?", answer: "The process of validating transactions and adding them to the blockchain ledger (often using proof-of-work)." },
+    { question: "What is a public vs private blockchain?", answer: "Public is open to anyone; private is restricted to selected participants." },
+    { question: "What is consensus in blockchain?", answer: "A method for network participants to agree on the validity of transactions (e.g., proof-of-work, proof-of-stake)." }
+  ]
+};
+
+const encryptionCategories = {
+  "File Encryption": [
+    { question: "What is BitLocker?", answer: "A Windows feature that provides full disk encryption using TPM and AES." },
+    { question: "What is FileVault?", answer: "A macOS encryption tool that provides full disk encryption using XTS-AES-128." },
+    { question: "What is LUKS?", answer: "Linux Unified Key Setup – standard for disk encryption in Linux systems." },
+    { question: "What does full disk encryption protect against?", answer: "Protects data at rest, especially on lost or stolen devices." },
+    { question: "Is full disk encryption enough on its own?", answer: "No, it's best combined with secure passwords and additional controls." },
+    { question: "What is a TPM chip used for in encryption?", answer: "It securely stores encryption keys and performs cryptographic operations." },
+    { question: "Can you use BitLocker without TPM?", answer: "Yes, with a USB startup key and local policy configuration." }
+  ]
 }; 
 
       let flashcards = [];
@@ -260,7 +286,11 @@ const cryptoCategories = {
   ? lawCategories
   : mode === "scripting"
   ? scriptingCategories
-  : cryptoCategories;
+  : mode === "crypto"
+  ? cryptoCategories
+  : mode === "blockchain"
+  ? blockchainCategories
+  : encryptionCategories;
         for (const [category, items] of Object.entries(source)) {
           if (selectedCategory === "All" || category === selectedCategory) {
             flashcards.push(...items.map(item => {
@@ -273,8 +303,8 @@ const cryptoCategories = {
           }
         }
         current = 0;
-        flashcardTitle.textContent = mode.charAt(0).toUpperCase() + mode.slice(1)
-  .replace('os', 'Operating Systems')
+         flashcardTitle.textContent = mode.charAt(0).toUpperCase() + mode.slice(1)
+  .replace('encryption', 'File Encryption')
   .replace('network', 'Networking')
   .replace('forensics', 'Forensics & Attacks')
   .replace('law', 'ICT Law & Criminality')
@@ -293,7 +323,13 @@ const source = mode === "hardware"
   ? forensicsCategories
   : mode === "law"
   ? lawCategories
-  : scriptingCategories;
+  : mode === "scripting"
+  ? scriptingCategories
+  : mode === "crypto"
+  ? cryptoCategories
+  : mode == "blockchain"
+  ? blockchainCategories
+  : encryptionCategories;
         for (const key of Object.keys(source)) {
           const option = document.createElement("option");
           option.value = key;
@@ -358,8 +394,10 @@ const source = mode === "hardware"
       document.getElementById("networkBtn").addEventListener("click", () => startSet("network"));
       document.getElementById("forensicsBtn").addEventListener("click", () => startSet("forensics"));
       document.getElementById("lawBtn").addEventListener("click", () => startSet("law"));
-        document.getElementById("scriptBtn").addEventListener("click", () => startSet("scripting"));
-document.getElementById("cryptoBtn").addEventListener("click", () => startSet("crypto"));
+      document.getElementById("scriptBtn").addEventListener("click", () => startSet("scripting"));
+      document.getElementById("cryptoBtn").addEventListener("click", () => startSet("crypto"));
+      document.getElementById("blockchainBtn").addEventListener("click", () => startSet("blockchain"));
+      document.getElementById("encryptionBtn").addEventListener("click", () => startSet("encryption"));
       document.getElementById("backBtn").addEventListener("click", goBack);
     });
 
